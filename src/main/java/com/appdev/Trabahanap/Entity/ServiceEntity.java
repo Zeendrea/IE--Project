@@ -20,14 +20,14 @@ public class ServiceEntity {
     private Double price; // Price of the service
 
     @Column(nullable = false)
-    private Boolean availability; // Availability status (true/false)
+    private String availability; // Availability status (true/false)
 
     // Default constructor
     public ServiceEntity() {
     }
 
     // Constructor with parameters
-    public ServiceEntity(String title, String description, Double price, Boolean availability) {
+    public ServiceEntity(String title, String description, Double price, String availability) {
         this.title = title;
         this.description = description;
         this.price = price;
@@ -67,11 +67,11 @@ public class ServiceEntity {
         this.price = price;
     }
 
-    public Boolean getAvailability() {
+    public String getAvailability() {
         return availability;
     }
 
-    public void setAvailability(Boolean availability) {
+    public void setAvailability(String availability) {
         this.availability = availability;
     }
 }

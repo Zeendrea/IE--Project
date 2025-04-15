@@ -20,10 +20,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.bind.annotation.CrossOrigin;
+
 
 import com.appdev.Trabahanap.Service.UserService;
 import com.appdev.Trabahanap.Entity.UserEntity;
 
+@CrossOrigin(origins = "http://localhost:3001")
 @RestController
 @RequestMapping("/user")
 public class UserController {
