@@ -15,7 +15,7 @@ public class ServiceController {
     @Autowired
     private ServiceService serviceService;
 
-    @GetMapping
+    @GetMapping("/getservice")
     @CrossOrigin(origins = "http://localhost:3000, http://localhost:5174")
     public List<ServiceEntity> getAllServices() {
         return serviceService.getAllServices();
@@ -27,7 +27,7 @@ public class ServiceController {
         return serviceService.getServiceById(serviceID);
     }
 
-    @PostMapping
+    @PostMapping("/create")
     @CrossOrigin(origins = "http://localhost:3000, http://localhost:5174")
     public ServiceEntity createService(@RequestBody ServiceEntity serviceEntity) {
         System.out.println("Received service data: " + serviceEntity); // Debug log

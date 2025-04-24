@@ -89,4 +89,6 @@ public class UserService {
     public Optional<UserEntity> findById(int userId) {
         return urepo.findById(userId);
     }
+
 }
+

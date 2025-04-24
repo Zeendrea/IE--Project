@@ -18,9 +18,9 @@ public class ServiceProviderEntity {
     private String rating;
     private String verifiedStatus;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy="serviceProvider", cascade = CascadeType.ALL)
+    /*@OneToMany(fetch = FetchType.LAZY, mappedBy="serviceProvider", cascade = CascadeType.ALL)
     @JsonManagedReference  // Avoids circular reference
-    private List<UserEntity> users;
+    private List<UserEntity> users;*/
 
 
     public ServiceProviderEntity(String serviceType, String rating, String verifiedStatus) {
@@ -49,9 +49,9 @@ public class ServiceProviderEntity {
         return verifiedStatus;
     }
 
-    public List<UserEntity> getUsers() {
+    /*public List<UserEntity> getUsers() {
         return users;
-    }
+    }*/
 
     public void setProviderId(int providerId) {
         this.providerId = providerId;
@@ -69,7 +69,7 @@ public class ServiceProviderEntity {
         this.verifiedStatus = verifiedStatus;
     }
 
-    public void setUsers(List<UserEntity> users) {
+    /*public void setUsers(List<UserEntity> users) {
         this.users = users;
-    }
+    }*/
 }

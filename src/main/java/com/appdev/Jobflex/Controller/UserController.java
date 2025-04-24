@@ -4,12 +4,13 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,14 +27,24 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import com.appdev. Jobflex.Service.UserService;
 import com.appdev. Jobflex.Entity.UserEntity;
 
-@CrossOrigin(origins = "http://localhost:3001")
+@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/user")
 public class UserController {
 	
 	@Autowired
 	private UserService userv;
-	
+
+	@GetMapping("/auth")
+	public OAuth2User getUser(@AuthenticationPrincipal OAuth2User principal) {
+		return principal;
+	}
+	@GetMapping("/auth/user-info")
+	public Map<String, Object> getUserAttributes(@AuthenticationPrincipal OAuth2User principal) {
+		return principal.getAttributes(); // includes userId, userType, etc.
+	}
+
+
 	@PostMapping("/add")
 	public UserEntity addUser(@RequestBody UserEntity user) {
 		return userv.saveUser(user);
@@ -157,20 +168,21 @@ public class UserController {
 	}
 
 
-	
-	@PostMapping("/update-role")
-    public ResponseEntity<?> updateRole(@RequestBody Map<String, Object> payload) {
-        int userId = Integer.parseInt(payload.get("userId").toString());
-        String userType = payload.get("userType").toString();
 
-        Optional<UserEntity> userOptional = userv.findById(userId);
-        if (userOptional.isPresent()) {
-            UserEntity user = userOptional.get();
-            user.setUserType(userType); // Set the userType (role)
-            userv.saveUser(user); // Save the updated user
-            return ResponseEntity.ok().body("Role updated successfully");
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
-        }
-    }
+	@PutMapping("/update-role")
+	public ResponseEntity<?> updateRole(@RequestBody Map<String, Object> payload) {
+		int userId = Integer.parseInt(payload.get("userId").toString());
+		String userType = payload.get("userType").toString();
+
+		Optional<UserEntity> userOptional = userv.findById(userId);
+		if (userOptional.isPresent()) {
+			UserEntity user = userOptional.get();
+			user.setUserType(userType); // Set the userType (role)
+			userv.saveUser(user); // Save the updated user
+			return ResponseEntity.ok().body("Role updated successfully");
+		} else {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+		}
+	}
+
 }

@@ -11,8 +11,8 @@
 	<groupId>com.appdev</groupId>
 	<artifactId>Trabahanap</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>Trabahanap</name>
-	<description>Trabahanap</description>
+	<name>JobFlex</name>
+	<description>JobFlex</description>
 	<url/>
 	<licenses>
 		<license/>
@@ -54,6 +54,24 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-oauth2-client</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
+		<dependency>
+			<artifactId>lombok</artifactId>
+			<groupId>org.projectlombok</groupId>
+			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 
