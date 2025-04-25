@@ -137,6 +137,7 @@ public class UserEntity {
 		// You can customize this logic
 		return (int) (Math.random() * 10000); // Example random ID
 	}
+
 }
 
 

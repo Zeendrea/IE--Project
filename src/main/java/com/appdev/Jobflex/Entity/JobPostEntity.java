@@ -23,6 +23,9 @@ public class JobPostEntity {
     private String description;
 
     @ManyToOne
-    @JoinColumn(name = "employer_id")
+    @JoinColumn(name = "user_id")
     private UserEntity employer;
+
+
+
 }

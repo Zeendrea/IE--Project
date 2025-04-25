@@ -30,6 +30,7 @@ public class SecurityConfig {
                                 "/home",
                                 "/user/auth/user",
                                 "/user/auth/user-info",
+                                "/api/**",
                                 "/static/**" // if you serve static files
                         ).permitAll()
                         .anyRequest().authenticated()
@@ -43,7 +44,7 @@ public class SecurityConfig {
                         .userInfoEndpoint(userInfo -> userInfo
                                 .userService(customOAuth2UserService) // <- IMPORTANT!
                         )
-                        .defaultSuccessUrl("http://localhost:3000/home", true)
+                        .defaultSuccessUrl("http://localhost:3000/homepage", true)
                 )
                 .logout(logout -> logout
                         .logoutSuccessUrl("/")
