@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
+import com.appdev.Jobflex.Entity.JobApplicationEntity;
+import com.appdev.Jobflex.Repository.JobApplicationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,6 +22,9 @@ public class UserService {
     @Autowired
     private UserRepository urepo;
 
+    @Autowired
+    private JobApplicationRepository jobApplicationRepository;
+
     // Save user to database
     public UserEntity saveUser(UserEntity user) {
         return urepo.save(user);
@@ -32,7 +37,7 @@ public class UserService {
 
     // Update user profile
     @SuppressWarnings("finally")
-    public UserEntity updateUser(int userId, UserEntity newUserDetails) {
+    /*public UserEntity updateUser(int userId, UserEntity newUserDetails) {
         UserEntity user = new UserEntity();
         try {
             user = urepo.findById(userId).get();  // Find user by ID
@@ -57,6 +62,36 @@ public class UserService {
             // Save the updated user to the database
             return urepo.save(user);
         }
+    }*/
+    public UserEntity updateUser(int userId, UserEntity newUserDetails) {
+        Optional<UserEntity> optionalUser = urepo.findById(userId);
+        if (!optionalUser.isPresent()) {
+            throw new RuntimeException("User not found");
+        }
+
+        UserEntity existingUser = optionalUser.get();
+
+        existingUser.setName(newUserDetails.getName());
+        existingUser.setEmail(newUserDetails.getEmail());
+        existingUser.setPhone(newUserDetails.getPhone());
+        existingUser.setAddress(newUserDetails.getAddress());
+        existingUser.setPassword(newUserDetails.getPassword());
+        existingUser.setUserType(newUserDetails.getUserType());
+
+        if (newUserDetails.getProfileImage() != null) {
+            existingUser.setProfileImage(newUserDetails.getProfileImage());
+        }
+
+        UserEntity updatedUser = urepo.save(existingUser);
+
+        // ⭐ NEW CODE: Update applicant name in job applications
+        List<JobApplicationEntity> applications = jobApplicationRepository.findByApplicant_UserId(userId);
+        for (JobApplicationEntity app : applications) {
+            app.setApplicantName(updatedUser.getName()); // Update the new name
+            jobApplicationRepository.save(app); // Save each updated application
+        }
+
+        return updatedUser;
     }
 
     // Delete a user

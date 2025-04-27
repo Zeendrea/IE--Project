@@ -2,6 +2,7 @@ package com.appdev. Jobflex.Controller;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -34,6 +35,21 @@ public class UserController {
 	
 	@Autowired
 	private UserService userv;
+
+	@GetMapping("/user-info")
+	public ResponseEntity<?> getUserInfo(@AuthenticationPrincipal OAuth2User principal) {
+		if (principal == null) {
+			return ResponseEntity.status(401).body("Not authenticated");
+		}
+
+		// Create a response with all OAuth2 attributes
+		Map<String, Object> response = new HashMap<>(principal.getAttributes());
+
+		// Log the attributes to help with debugging
+		System.out.println("OAuth2 Attributes: " + response);
+
+		return ResponseEntity.ok(response);
+	}
 
 	@GetMapping("/auth")
 	public OAuth2User getUser(@AuthenticationPrincipal OAuth2User principal) {
