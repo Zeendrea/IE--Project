@@ -2,9 +2,11 @@ package com.appdev.Jobflex.Controller;
 
 import com.appdev.Jobflex.Entity.JobApplicationEntity;
 import com.appdev.Jobflex.Entity.JobPostEntity;
+import com.appdev.Jobflex.Entity.JobSaveEntity;
 import com.appdev.Jobflex.Entity.UserEntity;
 import com.appdev.Jobflex.Repository.JobApplicationRepository;
 import com.appdev.Jobflex.Repository.JobPostRepository;
+import com.appdev.Jobflex.Repository.JobSaveRepository;
 import com.appdev.Jobflex.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -27,9 +29,12 @@ public class JobApplicationController {
     @Autowired
     private JobPostRepository jobPostRepository;
 
+    @Autowired
+    private JobSaveRepository jobSaveRepository;
+
+
     @PostMapping("/apply")
     public String applyForJob(@RequestParam int userId, @RequestParam int jobPostId) {
-        //UserEntity user = userRepository.findById(userId).orElse(null);
         UserEntity user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -43,13 +48,21 @@ public class JobApplicationController {
             return "Only Job Seekers can apply.";
         }
 
-        // NEW: create application and automatically set applicantName + jobTitle
-        JobApplicationEntity application = new JobApplicationEntity(user, jobPost);
+        // NEW: Check if the user has already applied for this job
+        Optional<JobApplicationEntity> existingApplication = jobApplicationRepository
+                .findByApplicant_UserIdAndJobPostId(userId, jobPostId);
 
+        if (existingApplication.isPresent()) {
+            return "You have already applied for this job.";
+        }
+
+        // Create new application if user hasn't applied already
+        JobApplicationEntity application = new JobApplicationEntity(user, jobPost);
         jobApplicationRepository.save(application);
 
         return "Application submitted successfully!";
     }
+
 
     @GetMapping("/applications/{userId}")
     public ResponseEntity<List<JobApplicationEntity>> getUserApplications(@PathVariable int userId) {
@@ -62,6 +75,30 @@ public class JobApplicationController {
         return new ResponseEntity<>(applications, HttpStatus.OK);
     }
 
+    @PostMapping("/save")
+    public String saveJobPost(@RequestParam int userId, @RequestParam int jobPostId) {
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        JobPostEntity jobPost = jobPostRepository.findById(jobPostId)
+                .orElseThrow(() -> new RuntimeException("Job Post not found"));
+
+        if (!"Job Seeker".equalsIgnoreCase(user.getUserType())) {
+            return "Only Job Seekers can save jobs.";
+        }
+
+        // Check if the user has already saved this job
+        Optional<JobSaveEntity> existingSavedJob = jobSaveRepository.findByUserAndJobPost(user, jobPost);
+        if (existingSavedJob.isPresent()) {
+            return "You have already saved this job.";
+        }
+
+        // Save the job post along with all its attributes in JobSaveEntity
+        JobSaveEntity savedJob = new JobSaveEntity(user, jobPost);
+        jobSaveRepository.save(savedJob);
+
+        return "Job saved successfully!";
+    }
 
 
 }
