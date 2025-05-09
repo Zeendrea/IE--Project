@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import com.appdev.Jobflex.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 
 import com.appdev. Jobflex.Service.UserService;
 import com.appdev. Jobflex.Entity.UserEntity;
+import org.springframework.web.server.ResponseStatusException;
 
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
@@ -35,6 +37,9 @@ public class UserController {
 	
 	@Autowired
 	private UserService userv;
+
+	@Autowired
+	private UserRepository userRepository;
 
 	@GetMapping("/user-info")
 	public ResponseEntity<?> getUserInfo(@AuthenticationPrincipal OAuth2User principal) {
@@ -200,5 +205,44 @@ public class UserController {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
 		}
 	}
+	@GetMapping("/{id}")
+	public ResponseEntity<?> getUserById(@PathVariable int id, @RequestParam(required = false) Integer requesterId) {
+		try {
+			Optional<UserEntity> userOpt = userRepository.findById(id);
 
+			if (userOpt.isEmpty()) {
+				return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+			}
+
+			UserEntity user = userOpt.get();
+
+			// If this is an employer viewing a job seeker
+			if (requesterId != null) {
+				Optional<UserEntity> requesterOpt = userRepository.findById(requesterId);
+
+				if (requesterOpt.isEmpty() || !"Employer".equalsIgnoreCase(requesterOpt.get().getUserType())) {
+					return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Only employers can view applicant profiles");
+				}
+			}
+
+			// Create a safe user profile with only necessary information
+			Map<String, Object> profile = new HashMap<>();
+			profile.put("userId", user.getUserId());
+			profile.put("name", user.getName());
+			profile.put("email", user.getEmail());
+			profile.put("phone", user.getPhone());
+			profile.put("address", user.getAddress());
+			profile.put("userType", user.getUserType());
+			profile.put("profileImage", user.getProfileImage());
+
+			return ResponseEntity.ok(profile);
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body("Error fetching user: " + e.getMessage());
+		}
+	}
+	@GetMapping("/test/{id}")
+	public ResponseEntity<String> testEndpoint(@PathVariable int id) {
+		return ResponseEntity.ok("Test endpoint working for ID: " + id);
+	}
 }

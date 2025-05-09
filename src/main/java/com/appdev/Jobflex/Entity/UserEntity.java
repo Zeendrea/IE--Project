@@ -6,8 +6,12 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.Setter;
+import lombok.Getter;
 
 @Entity
+@Setter
+@Getter
 @Table(name="users")
 public class UserEntity {
 
@@ -15,20 +19,27 @@ public class UserEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int userId;
 
-	private String googleId;
+	@Setter
+    private String googleId;
 
-	private String name;
+    private String name;
 
-	@Column(unique = true)
+	@Setter
+    @Column(unique = true)
 	private String email;
 
-	private String phone;
-	private String address;
-	private String password;
+	@Setter
+    private String phone;
+	@Setter
+    private String address;
+	@Setter
+    private String password;
 	private String userType;
-	private String profileImage;
+	@Setter
+    private String profileImage;
 
-	private Integer employerId; // New field
+	@Setter
+    private Integer employerId; // New field
 
 	public UserEntity(String name, String email, String phone, String address, String password, String userType) {
 		this.name = name;
@@ -91,31 +102,7 @@ public class UserEntity {
 		this.userId = userId;
 	}
 
-	public void setGoogleId(String googleId) {
-		this.googleId = googleId;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public void setEmail(String email) {
-		this.email = email;
-	}
-
-	public void setPhone(String phone) {
-		this.phone = phone;
-	}
-
-	public void setAddress(String address) {
-		this.address = address;
-	}
-
-	public void setPassword(String password) {
-		this.password = password;
-	}
-
-	public void setUserType(String userType) {
+    public void setUserType(String userType) {
 		this.userType = userType;
 
 		if ("employer".equalsIgnoreCase(userType)) {
@@ -125,15 +112,7 @@ public class UserEntity {
 		}
 	}
 
-	public void setProfileImage(String profileImage) {
-		this.profileImage = profileImage;
-	}
-
-	public void setEmployerId(Integer employerId) {
-		this.employerId = employerId;
-	}
-
-	private int generateEmployerId() {
+    private int generateEmployerId() {
 		// You can customize this logic
 		return (int) (Math.random() * 10000); // Example random ID
 	}

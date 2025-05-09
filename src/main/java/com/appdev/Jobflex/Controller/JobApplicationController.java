@@ -8,10 +8,12 @@ import com.appdev.Jobflex.Repository.JobApplicationRepository;
 import com.appdev.Jobflex.Repository.JobPostRepository;
 import com.appdev.Jobflex.Repository.JobSaveRepository;
 import com.appdev.Jobflex.Repository.UserRepository;
+import com.appdev.Jobflex.Service.JobApplicationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
@@ -31,6 +33,9 @@ public class JobApplicationController {
 
     @Autowired
     private JobSaveRepository jobSaveRepository;
+
+    @Autowired
+    private JobApplicationService jobApplicationService;
 
 
     @PostMapping("/apply")
@@ -98,6 +103,62 @@ public class JobApplicationController {
         jobSaveRepository.save(savedJob);
 
         return "Job saved successfully!";
+    }
+
+    @PutMapping("/update/{id}")
+    public ResponseEntity<String> updateApplicationStatus(
+            @PathVariable int id,
+            @RequestParam String status,
+            @RequestParam int userId) {
+        jobApplicationService.updateApplicationStatus(id, status, userId);
+        return ResponseEntity.ok("Application status updated successfully");
+    }
+    @GetMapping("/applications/job/{jobId}/count")
+    public ResponseEntity<Integer> getApplicationCountByJobId(
+            @PathVariable int jobId,
+            @RequestParam int userId) {
+
+        // Verify the user requesting is the employer who owns this job
+        JobPostEntity jobPost = jobPostRepository.findById(jobId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Job not found"));
+
+        if (jobPost.getEmployer().getUserId() != userId) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "You don't have permission to view these applications");
+        }
+
+        // Count the applications
+        long count = jobApplicationRepository.countByJobPost_Id(jobId);
+
+        return ResponseEntity.ok((int) count);
+    }
+    @GetMapping("/job/{jobId}")
+    public ResponseEntity<List<JobApplicationEntity>> getApplicationsByJobId(
+            @PathVariable int jobId,
+            @RequestParam int userId) {
+
+        // Verify the user requesting is the employer who owns this job
+        JobPostEntity jobPost = jobPostRepository.findById(jobId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Job not found"));
+
+        if (jobPost.getEmployer().getUserId() != userId) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "You don't have permission to view these applications");
+        }
+
+        // Fetch the applications
+        List<JobApplicationEntity> applications = jobApplicationRepository.findByJobPost_Id(jobId);
+
+        // Debug log - check if each application has the applicant field populated
+        for (JobApplicationEntity app : applications) {
+            if (app.getApplicant() == null) {
+                System.out.println("WARNING: Application ID " + app.getId() + " has null applicant");
+            } else {
+                System.out.println("Application ID " + app.getId() + " has applicant ID " + app.getApplicant().getUserId());
+            }
+        }
+
+        return ResponseEntity.ok(applications);
     }
 
 

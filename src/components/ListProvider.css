@@ -1,0 +1,40 @@
+
+.containerStyle {
+    margin: 20px auto;
+    padding: 20px;
+    width: fit-content;
+    background-color: transparent;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    display: flex;
+    flex-wrap: wrap;
+    border: 1px solid #ddd;
+}
+
+
+.provider-card {
+    background-color: #ffffff;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    height: 200px; 
+    width: 350px;
+    margin: 5px;
+}
+
+.provider-card h4 {
+    color: #333;
+    font-size: 1.1rem;
+    margin: 0;
+}
+
+.provider-card .actions {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 10px;
+}
