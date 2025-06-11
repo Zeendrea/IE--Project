@@ -1,0 +1,32 @@
+.cancel-button{
+    background-color:#2F65F4;
+}
+.status-declined {
+    color: red;
+    font-weight: bold;
+  }
+  
+  .accept-button, .decline-button {
+    margin: 0 5px;
+    padding: 5px 10px;
+  }
+  
+  .accept-button {
+    background-color: green;
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .decline-button {
+    background-color: red;
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
+  .status-declined {
+    color: red;
+    font-weight: bold;
+  }
+  
+  
