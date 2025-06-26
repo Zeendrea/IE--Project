@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import './HomePage.css';
 import { useNavigate } from 'react-router-dom';
 import HomeNavbar from './HomeNavbar';
-import { HelpOutline } from '@mui/icons-material';
 import { 
   Grid, 
   Card, 
@@ -21,10 +19,8 @@ import {
   IconButton,
   Skeleton,
   Container,
-  Popper,
-  Grow,
-  ClickAwayListener,
-  Tooltip
+  Tooltip,
+  Fade
 } from '@mui/material';
 import { 
   Search, 
@@ -32,7 +28,6 @@ import {
   BusinessCenter, 
   AttachMoney, 
   Schedule, 
-  Bookmark, 
   BookmarkBorder,
   KeyboardArrowRight,
   Work,
@@ -43,31 +38,183 @@ import {
   Engineering as EngineeringIcon,
   Computer as TechnologyIcon,
   Storefront as RetailIcon,
-  AccessTime
+  AccessTime,
+  Home as HomeIcon,
+  GraduationCap,
+  Laptop,
+  Heart,
+  TrendingUp,
+  Build,
+  Apps as ThLarge,
+  Star,
+  TrendingDown
 } from '@mui/icons-material';
-import { styled } from '@mui/material/styles';
+import { styled, keyframes } from '@mui/material/styles';
 
-const StyledTextField = styled(TextField)({
-  "& .MuiOutlinedInput-root": {
-    "& fieldset": { border: "none" },
-    "&:hover fieldset": { border: "none" },
-    "&.Mui-focused fieldset": { border: "none" },
-  },
-  "& .MuiInputBase-input": {
-    padding: "4px 0",
-  },
-});
+// Animations
+const float = keyframes`
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+`;
 
-const SearchButton = styled(Button)({
-  backgroundColor: "black",
-  color: "white",
-  borderRadius: "4px",
-  "&:hover": {
-    backgroundColor: "#333",
+const slideInUp = keyframes`
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+`;
+
+// Styled Components
+const WelcomeSection = styled(Box)(({ theme }) => ({
+  background: 'linear-gradient(135deg, #000000 0%, #1e2b24 100%)',
+  color: 'white',
+  padding: '3rem',
+  borderRadius: '20px',
+  marginBottom: '3rem',
+  boxShadow: '0 12px 40px rgba(0,0,0,0.15)',
+  position: 'relative',
+  overflow: 'hidden',
+  textAlign: 'center',
+  animation: `${slideInUp} 0.8s ease-out`,
+  '&::before': {
+    content: '""',
+    position: 'absolute',
+    top: '-50%',
+    right: '-50%',
+    width: '400px',
+    height: '400px',
+    background: 'radial-gradient(circle, rgba(45,190,95,0.1) 0%, rgba(45,190,95,0) 70%)',
+    borderRadius: '50%',
+    animation: `${float} 8s ease-in-out infinite`,
+  }
+}));
+
+const WelcomeTitle = styled(Typography)(({ theme }) => ({
+  fontSize: '3rem',
+  fontWeight: 800,
+  marginBottom: '1rem',
+  background: 'linear-gradient(45deg, #2DBE5F, #28ab56)',
+  WebkitBackgroundClip: 'text',
+  WebkitTextFillColor: 'transparent',
+  backgroundClip: 'text',
+  position: 'relative',
+  zIndex: 2,
+  [theme.breakpoints.down('md')]: {
+    fontSize: '2.5rem',
+  }
+}));
+
+const SearchContainer = styled(Paper)(({ theme }) => ({
+  background: 'rgba(255,255,255,0.95)',
+  backdropFilter: 'blur(20px)',
+  borderRadius: '20px',
+  padding: '2rem',
+  marginBottom: '3rem',
+  border: '1px solid rgba(45, 190, 95, 0.1)',
+  boxShadow: '0 12px 40px rgba(0,0,0,0.08)',
+  position: 'relative',
+  zIndex: 2,
+  animation: `${slideInUp} 0.8s ease-out 0.2s backwards`,
+}));
+
+const CategoryCard = styled(Card)(({ theme }) => ({
+  background: 'white',
+  border: '2px solid rgba(45, 190, 95, 0.1)',
+  borderRadius: '20px',
+  padding: '2rem',
+  textAlign: 'center',
+  cursor: 'pointer',
+  transition: 'all 0.3s ease',
+  position: 'relative',
+  overflow: 'hidden',
+  boxShadow: '0 8px 25px rgba(0,0,0,0.05)',
+  height: '100%',
+  '&::before': {
+    content: '""',
+    position: 'absolute',
+    top: 0,
+    left: '-100%',
+    width: '100%',
+    height: '100%',
+    background: 'linear-gradient(90deg, transparent, rgba(45,190,95,0.05), transparent)',
+    transition: 'left 0.5s ease',
   },
-  textTransform: "none",
-  padding: "6px 16px",
-});
+  '&:hover': {
+    transform: 'translateY(-8px) scale(1.02)',
+    borderColor: 'rgba(45, 190, 95, 0.3)',
+    boxShadow: '0 20px 40px rgba(0,0,0,0.1)',
+    '&::before': {
+      left: '100%',
+    },
+    '& .category-button': {
+      opacity: 1,
+      transform: 'translateY(0)',
+    }
+  }
+}));
+
+const BrowseAllCard = styled(CategoryCard)(({ theme }) => ({
+  background: 'linear-gradient(135deg, #2DBE5F, #28ab56)',
+  color: 'white',
+  borderColor: 'rgba(45, 190, 95, 0.3)',
+  '& .category-button': {
+    background: 'white',
+    color: '#2DBE5F',
+    opacity: 1,
+    transform: 'translateY(0)',
+    '&:hover': {
+      background: 'rgba(255,255,255,0.9)',
+    }
+  }
+}));
+
+const CategoryButton = styled(Button)(({ theme }) => ({
+  background: 'linear-gradient(135deg, #2DBE5F, #28ab56)',
+  color: 'white',
+  border: 'none',
+  padding: '0.8rem 1.5rem',
+  borderRadius: '10px',
+  fontWeight: 600,
+  cursor: 'pointer',
+  transition: 'all 0.3s ease',
+  opacity: 0,
+  transform: 'translateY(20px)',
+  textTransform: 'none',
+}));
+
+const StatsBar = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  justifyContent: 'center',
+  gap: '3rem',
+  background: 'white',
+  padding: '2rem',
+  borderRadius: '20px',
+  marginBottom: '3rem',
+  boxShadow: '0 8px 25px rgba(0,0,0,0.05)',
+  border: '1px solid rgba(45, 190, 95, 0.1)',
+  [theme.breakpoints.down('md')]: {
+    flexDirection: 'column',
+    gap: '1.5rem',
+    textAlign: 'center',
+  }
+}));
+
+const FloatingShape = styled(Box)(({ theme }) => ({
+  position: 'fixed',
+  background: 'rgba(45,190,95,0.05)',
+  borderRadius: '50%',
+  animation: `${float} 10s ease-in-out infinite`,
+  pointerEvents: 'none',
+  zIndex: 0,
+}));
 
 // Function to format date and time
 const formatDateTime = (dateTimeString) => {
@@ -75,11 +222,8 @@ const formatDateTime = (dateTimeString) => {
   
   try {
     const date = new Date(dateTimeString);
-    
-    // Check if date is valid
     if (isNaN(date.getTime())) return "Recently posted";
     
-    // Calculate relative time
     const now = new Date();
     const diffTime = Math.abs(now - date);
     const diffMinutes = Math.floor(diffTime / (1000 * 60));
@@ -105,41 +249,25 @@ const formatDateTime = (dateTimeString) => {
   }
 };
 
-// Format date for the tooltip
-const formatFullDateTime = (dateTimeString) => {
-  if (!dateTimeString) return "";
-  
-  try {
-    const date = new Date(dateTimeString);
-    return date.toLocaleString('en-US', { 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric',
-      hour: 'numeric',
-      minute: 'numeric'
-    });
-  } catch (error) {
-    return "";
-  }
-};
-
-// Function to get appropriate icon for category
+// Get category icon
 const getCategoryIcon = (category) => {
   switch(category?.toLowerCase()) {
     case 'technology':
-      return <TechnologyIcon />;
+      return <TechnologyIcon sx={{ fontSize: '3rem', color: '#2DBE5F', mb: 1 }} />;
     case 'healthcare':
-      return <HealthcareIcon />;
+      return <HealthcareIcon sx={{ fontSize: '3rem', color: '#2DBE5F', mb: 1 }} />;
     case 'finance':
-      return <FinanceIcon />;
+      return <FinanceIcon sx={{ fontSize: '3rem', color: '#2DBE5F', mb: 1 }} />;
     case 'engineering':
-      return <EngineeringIcon />;
+      return <EngineeringIcon sx={{ fontSize: '3rem', color: '#2DBE5F', mb: 1 }} />;
     case 'education':
-      return <EducationIcon />;
+      return <EducationIcon sx={{ fontSize: '3rem', color: '#2DBE5F', mb: 1 }} />;
+    case 'remote':
+      return <HomeIcon sx={{ fontSize: '3rem', color: '#2DBE5F', mb: 1 }} />;
     case 'retail':
-      return <RetailIcon />;
+      return <RetailIcon sx={{ fontSize: '3rem', color: '#2DBE5F', mb: 1 }} />;
     default:
-      return <CategoryIcon />;
+      return <BusinessCenter sx={{ fontSize: '3rem', color: '#2DBE5F', mb: 1 }} />;
   }
 };
 
@@ -147,19 +275,19 @@ const getCategoryIcon = (category) => {
 const getCategoryColor = (category) => {
   switch(category) {
     case 'Technology':
-      return { bg: '#e3f2fd', color: '#1976d2' }; // blue
+      return { bg: '#e3f2fd', color: '#1976d2' };
     case 'Healthcare':
-      return { bg: '#e8eaf6', color: '#3f51b5' }; // indigo
+      return { bg: '#e8eaf6', color: '#3f51b5' };
     case 'Finance':
-      return { bg: '#fff8e1', color: '#ffa000' }; // amber
+      return { bg: '#fff8e1', color: '#ffa000' };
     case 'Engineering':
-      return { bg: '#f3e5f5', color: '#9c27b0' }; // purple
+      return { bg: '#f3e5f5', color: '#9c27b0' };
     case 'Remote':
-      return { bg: '#e0f7fa', color: '#00acc1' }; // cyan
+      return { bg: '#e0f7fa', color: '#00acc1' };
     case 'Education':
-      return { bg: '#fce4ec', color: '#e91e63' }; // pink
+      return { bg: '#fce4ec', color: '#e91e63' };
     default:
-      return { bg: '#f5f5f5', color: '#757575' }; // grey
+      return { bg: '#f5f5f5', color: '#757575' };
   }
 };
 
@@ -168,24 +296,23 @@ const JobCard = ({ job, selected, onClick }) => {
   const getJobTypeColor = (jobType) => {
     switch(jobType) {
       case 'Full-time':
-        return { bg: '#e8f5e9', color: '#2e7d32' }; // green
+        return { bg: '#e8f5e9', color: '#2e7d32' };
       case 'Part-time':
-        return { bg: '#f1f8e9', color: '#558b2f' }; // light green
+        return { bg: '#f1f8e9', color: '#558b2f' };
       case 'Temporary':
-        return { bg: '#f9fbe7', color: '#827717' }; // lime
+        return { bg: '#f9fbe7', color: '#827717' };
       case 'Internship':
-        return { bg: '#e0f2f1', color: '#00695c' }; // teal
+        return { bg: '#e0f2f1', color: '#00695c' };
       case 'Freelance':
-        return { bg: '#e8f5e9', color: '#1b5e20' }; // dark green
+        return { bg: '#e8f5e9', color: '#1b5e20' };
       case 'Seasonal':
-        return { bg: '#f1f8e9', color: '#33691e' }; // green variant
+        return { bg: '#f1f8e9', color: '#33691e' };
       default:
-        return { bg: '#e3f2fd', color: '#1976d2' }; // blue (default)
+        return { bg: '#e3f2fd', color: '#1976d2' };
     }
   };
 
   const relativeTime = formatDateTime(job.postedDate);
-  const fullDateTime = formatFullDateTime(job.postedDate);
   const jobTypeStyle = getJobTypeColor(job.jobType || 'Full-time');
   const categoryStyle = getCategoryColor(job.category || 'Other');
 
@@ -196,12 +323,12 @@ const JobCard = ({ job, selected, onClick }) => {
         mb: 2,
         p: 0,
         cursor: 'pointer',
-        borderRadius: 2,
-        boxShadow: selected ? 3 : 1,
-        borderLeft: selected ? '4px solid #000' : 'none',
+        borderRadius: 3,
+        boxShadow: selected ? 4 : 1,
+        borderLeft: selected ? '4px solid #2DBE5F' : 'none',
         transition: 'all 0.2s ease',
         '&:hover': {
-          boxShadow: 3,
+          boxShadow: 4,
           transform: 'translateY(-2px)',
         },
         position: 'relative',
@@ -209,17 +336,6 @@ const JobCard = ({ job, selected, onClick }) => {
       }}
       onClick={onClick}
     >
-      {selected && (
-        <Box sx={{ 
-          position: 'absolute', 
-          top: 0, 
-          bottom: 0, 
-          left: 0, 
-          width: '4px', 
-          backgroundColor: 'black' 
-        }} />
-      )}
-      
       <CardContent sx={{ p: 2 }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
           <Box>
@@ -231,17 +347,16 @@ const JobCard = ({ job, selected, onClick }) => {
               {job.company}
             </Typography>
           </Box>
-          <Box>
-            <Chip 
-              size="small" 
-              label={job.jobType || "Full-time"} 
-              sx={{ 
-                backgroundColor: jobTypeStyle.bg,
-                color: jobTypeStyle.color,
-                fontWeight: 'bold'
-              }} 
-            />
-          </Box>
+          <Chip 
+            size="small" 
+            label={job.jobType || "Full-time"} 
+            sx={{ 
+              backgroundColor: jobTypeStyle.bg,
+              color: jobTypeStyle.color,
+              fontWeight: 'bold',
+              borderRadius: 2
+            }} 
+          />
         </Box>
         
         <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
@@ -261,7 +376,7 @@ const JobCard = ({ job, selected, onClick }) => {
                 backgroundColor: categoryStyle.bg,
                 color: categoryStyle.color,
                 fontWeight: 'medium',
-                borderRadius: 10,
+                borderRadius: 2,
                 height: 20,
                 fontSize: '0.625rem',
                 ml: 0.5
@@ -270,49 +385,46 @@ const JobCard = ({ job, selected, onClick }) => {
           </Box>
         )}
         
-        <Box sx={{ display: 'flex', gap: 2, my: 1 }}>
+        <Box sx={{ display: 'flex', gap: 1, my: 1 }}>
           {job.pay && (
             <Chip 
               size="small" 
               label={job.pay} 
-              icon={<AttachMoney sx={{ fontSize: 16 }} />}
+              icon={<AttachMoney sx={{ fontSize: 14 }} />}
               variant="outlined"
-              sx={{ borderRadius: 1 }}
+              sx={{ borderRadius: 2 }}
             />
           )}
           {job.shiftAndSchedule && (
             <Chip 
               size="small" 
               label={job.shiftAndSchedule} 
-              icon={<Schedule sx={{ fontSize: 16 }} />}
+              icon={<Schedule sx={{ fontSize: 14 }} />}
               variant="outlined"
-              sx={{ borderRadius: 1 }}
+              sx={{ borderRadius: 2 }}
             />
           )}
         </Box>
         
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 1 }}>
-          <Tooltip title={fullDateTime} arrow placement="top">
-            <Box sx={{ display: 'flex', alignItems: 'center' }}>
-              <AccessTime sx={{ fontSize: 14, color: 'text.secondary', mr: 0.5 }} />
-              <Typography variant="caption" color="text.secondary">
-                {relativeTime}
-              </Typography>
-            </Box>
-          </Tooltip>
-          <KeyboardArrowRight sx={{ color: selected ? 'black' : 'text.disabled' }} />
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <AccessTime sx={{ fontSize: 14, color: 'text.secondary', mr: 0.5 }} />
+            <Typography variant="caption" color="text.secondary">
+              {relativeTime}
+            </Typography>
+          </Box>
+          <KeyboardArrowRight sx={{ color: selected ? '#2DBE5F' : 'text.disabled' }} />
         </Box>
       </CardContent>
     </Card>
   );
 };
 
-// Updated JobDetailCard component with fixed layout for visible job description
+// Job Detail Card component
 const JobDetailCard = ({ job, onApply, onSave }) => {
   const categoryStyle = getCategoryColor(job.category || 'Other');
   const categoryIcon = getCategoryIcon(job.category);
   const relativeTime = formatDateTime(job.postedDate);
-  const fullDateTime = formatFullDateTime(job.postedDate);
 
   return (
     <Card sx={{ 
@@ -323,19 +435,14 @@ const JobDetailCard = ({ job, onApply, onSave }) => {
       display: 'flex',
       flexDirection: 'column',
       width: '100%',
-      textAlign: 'left',
-      position: 'relative', // Changed from sticky to relative for better layout
       minHeight: { md: 'calc(100vh - 400px)' }
     }}>
       <Box sx={{ 
         p: 3, 
-        backgroundColor: 'black', 
+        background: 'linear-gradient(135deg, #000000 0%, #1e2b24 100%)', 
         color: 'white',
         borderTopLeftRadius: 3,
         borderTopRightRadius: 3,
-        textAlign: 'left',
-        pt: 3, 
-        pb: 3
       }}>
         <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold' }}>
           {job.title}
@@ -364,16 +471,13 @@ const JobDetailCard = ({ job, onApply, onSave }) => {
         <Box sx={{ display: 'flex', alignItems: 'center', mt: 2 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', mr: 2 }}>
             <AccessTime sx={{ fontSize: 16, mr: 0.5 }} />
-            <Tooltip title={fullDateTime} arrow placement="top">
-              <Typography variant="body2">
-                Posted {relativeTime}
-              </Typography>
-            </Tooltip>
+            <Typography variant="body2">
+              Posted {relativeTime}
+            </Typography>
           </Box>
           
           {job.category && (
             <Box sx={{ display: 'flex', alignItems: 'center', opacity: 0.8 }}>
-              {categoryIcon}
               <Chip
                 size="small"
                 label={job.category}
@@ -393,7 +497,6 @@ const JobDetailCard = ({ job, onApply, onSave }) => {
       <Box sx={{ 
         p: 3, 
         flex: '1 1 auto',
-        height: 'calc(100% - 170px)', // Fixed height calculation
         overflowY: 'auto',
         display: 'flex',
         flexDirection: 'column'
@@ -402,13 +505,14 @@ const JobDetailCard = ({ job, onApply, onSave }) => {
           <Button
             variant="contained"
             sx={{ 
-              backgroundColor: "black", 
-              color: "white",
+              background: 'linear-gradient(135deg, #2DBE5F, #28ab56)', 
+              color: 'white',
               '&:hover': {
-                backgroundColor: "#333",
+                background: 'linear-gradient(135deg, #28ab56, #259a4d)',
               },
               flex: 1,
-              py: 1.5
+              py: 1.5,
+              borderRadius: 2
             }}
             onClick={() => onApply && onApply(job.id)}
           >
@@ -417,13 +521,14 @@ const JobDetailCard = ({ job, onApply, onSave }) => {
           <Button
             variant="outlined"
             sx={{ 
-              borderColor: "black", 
-              color: "black",
+              borderColor: '#2DBE5F', 
+              color: '#2DBE5F',
               '&:hover': {
-                backgroundColor: "#f5f5f5",
-                borderColor: "black",
+                backgroundColor: 'rgba(45, 190, 95, 0.04)',
+                borderColor: '#2DBE5F',
               },
-              py: 1.5
+              py: 1.5,
+              borderRadius: 2
             }}
             startIcon={<BookmarkBorder />}
             onClick={() => onSave && onSave(job.id)}
@@ -433,15 +538,15 @@ const JobDetailCard = ({ job, onApply, onSave }) => {
         </Box>
         
         <Box sx={{ mb: 3 }}>
-          <Typography variant="h6" gutterBottom>Job Details</Typography>
+          <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>Job Details</Typography>
           <Grid container spacing={2}>
             {job.pay && (
               <Grid item xs={6}>
                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                  <AttachMoney sx={{ mr: 1, color: 'text.secondary' }} />
+                  <Typography sx={{ mr: 1, color: '#2DBE5F', fontSize: '1.2rem', fontWeight: 'bold' }}>₱</Typography>
                   <Box>
                     <Typography variant="body2" color="text.secondary">Salary</Typography>
-                    <Typography variant="body1">{job.pay}</Typography>
+                    <Typography variant="body1" fontWeight={500}>{job.pay}</Typography>
                   </Box>
                 </Box>
               </Grid>
@@ -449,10 +554,10 @@ const JobDetailCard = ({ job, onApply, onSave }) => {
             {job.jobType && (
               <Grid item xs={6}>
                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                  <BusinessCenter sx={{ mr: 1, color: 'text.secondary' }} />
+                  <BusinessCenter sx={{ mr: 1, color: '#2DBE5F' }} />
                   <Box>
                     <Typography variant="body2" color="text.secondary">Job Type</Typography>
-                    <Typography variant="body1">{job.jobType}</Typography>
+                    <Typography variant="body1" fontWeight={500}>{job.jobType}</Typography>
                   </Box>
                 </Box>
               </Grid>
@@ -460,42 +565,40 @@ const JobDetailCard = ({ job, onApply, onSave }) => {
             {job.shiftAndSchedule && (
               <Grid item xs={6}>
                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                  <Schedule sx={{ mr: 1, color: 'text.secondary' }} />
+                  <Schedule sx={{ mr: 1, color: '#2DBE5F' }} />
                   <Box>
                     <Typography variant="body2" color="text.secondary">Schedule</Typography>
-                    <Typography variant="body1">{job.shiftAndSchedule}</Typography>
+                    <Typography variant="body1" fontWeight={500}>{job.shiftAndSchedule}</Typography>
                   </Box>
                 </Box>
               </Grid>
             )}
-            {job.category && (
-              <Grid item xs={6}>
-                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                  <CategoryIcon sx={{ mr: 1, color: 'text.secondary' }} />
-                  <Box>
-                    <Typography variant="body2" color="text.secondary">Category</Typography>
-                    <Typography variant="body1">{job.category}</Typography>
-                  </Box>
+            <Grid item xs={6}>
+              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <CategoryIcon sx={{ mr: 1, color: '#2DBE5F' }} />
+                <Box>
+                  <Typography variant="body2" color="text.secondary">Category</Typography>
+                  <Typography variant="body1" fontWeight={500}>{job.category || "Other"}</Typography>
                 </Box>
-              </Grid>
-            )}
+              </Box>
+            </Grid>
           </Grid>
         </Box>
         
         <Divider sx={{ my: 2 }} />
         
-        {/* Job Description Section - Fixed to ensure visibility */}
         <Box sx={{ 
           flex: '1 1 auto',
           overflowY: 'auto',
-          pb: 2 // Add padding at the bottom for better readability
+          pb: 2
         }}>
-          <Typography variant="h6" gutterBottom>Job Description</Typography>
+          <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>Job Description</Typography>
           <Typography 
             variant="body1" 
             sx={{ 
               color: 'text.secondary', 
-              whiteSpace: 'pre-line'
+              whiteSpace: 'pre-line',
+              lineHeight: 1.6
             }}
           >
             {job.description}
@@ -511,13 +614,13 @@ function HomePage() {
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('info');
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")) || {});
-  const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [selectedJob, setSelectedJob] = useState(null);
   const [categoryFilter, setCategoryFilter] = useState("all");
+  const [statsAnimated, setStatsAnimated] = useState(false);
 
   const [filters, setFilters] = useState({
     title: '',
@@ -526,14 +629,14 @@ function HomePage() {
   
   // Available categories
   const categories = [
-    "All",
-    "Technology",
-    "Healthcare",
-    "Finance",
-    "Engineering",
-    "Remote",
-    "Education",
-    "Other"
+    { name: "All", icon: "Apps" },
+    { name: "Technology", icon: "Laptop" },
+    { name: "Healthcare", icon: "Heart" },
+    { name: "Finance", icon: "TrendingUp" },
+    { name: "Engineering", icon: "Build" },
+    { name: "Remote", icon: "Home" },
+    { name: "Education", icon: "GraduationCap" },
+    { name: "Other", icon: "BusinessCenter" }
   ];
 
   const handleApply = async (jobPostId) => {
@@ -568,32 +671,7 @@ function HomePage() {
       setSnackbarOpen(true);
     }
   };
-  const detectCategoryInInput = (input) => {
-    const lowercaseInput = input.toLowerCase();
-    
-    // Category keywords dictionary with variations
-    const categoryKeywords = {
-      "technology": ["tech", "software", "programming", "developer", "it", "computer", "web", "data", "cloud"],
-      "healthcare": ["health", "medical", "nurse", "doctor", "hospital", "clinic", "patient", "care", "pharma"],
-      // ... other categories and their keywords
-    };
-    
-    // Check for direct matches or keyword matches
-    for (const [category, keywords] of Object.entries(categoryKeywords)) {
-      if (lowercaseInput === category) {
-        return category.charAt(0).toUpperCase() + category.slice(1);
-      }
-      
-      for (const keyword of keywords) {
-        const regex = new RegExp(`\\b${keyword}\\b`, 'i');
-        if (regex.test(lowercaseInput)) {
-          return category.charAt(0).toUpperCase() + category.slice(1);
-        }
-      }
-    }
-    
-    return null; // No category detected
-  };
+
   const handleSave = async (jobPostId) => {
     if (user.userType !== 'Job Seeker') {
       setSnackbarMessage("Only Job Seekers can save jobs.");
@@ -629,44 +707,21 @@ function HomePage() {
 
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
-    
-    setFilters((prev) => ({
-      ...prev,
-      [name]: value
-    }));
-    
-    // If changing the title field, check for category keywords
-    if (name === 'title') {
-      const detectedCategory = detectCategoryInInput(value);
-      if (detectedCategory) {
-        setCategoryFilter(detectedCategory);
-      } else if (categoryFilter !== 'all' && value === '') {
-        // If the user clears the search and a category was selected, reset to "all"
-        setCategoryFilter('all');
-      }
-    }
-  };
-  // Handle category change
-  const handleCategoryChange = (e, newValue) => {
-    setCategoryFilter(newValue);
+    setFilters((prev) => ({ ...prev, [name]: value }));
   };
 
   // Filter jobs based on all criteria
   const filteredJobs = jobs
-    .filter(job => job.status === "OPEN" || job.status === undefined) // Only show OPEN jobs
+    .filter(job => job.status === "OPEN" || job.status === undefined)
     .filter(job => {
-      // Apply category filter if it's not "all"
       if (categoryFilter && categoryFilter !== "all" && categoryFilter !== "All") {
         if (!job.category || job.category.toLowerCase() !== categoryFilter.toLowerCase()) {
           return false;
         }
       }
       
-      // Title/company search
       const titleMatch = job.title.toLowerCase().includes(filters.title.toLowerCase());
       const companyMatch = job.company.toLowerCase().includes(filters.title.toLowerCase());
-      
-      // Location search
       const locationMatch = !filters.location || 
         job.location.toLowerCase().includes(filters.location.toLowerCase());
       
@@ -679,7 +734,6 @@ function HomePage() {
       const res = await fetch("http://localhost:8080/api/jobs/all");
       const data = await res.json();
       
-      // Set default status to "OPEN" for backward compatibility with existing jobs
       const jobsWithStatus = data.map(job => ({
         ...job,
         status: job.status || "OPEN",
@@ -689,7 +743,6 @@ function HomePage() {
       setJobs(jobsWithStatus);
       setLoading(false);
       
-      // If we have search results, select the first job
       if (filteredJobs.length > 0) {
         setSelectedJob(filteredJobs[0]);
       }
@@ -703,148 +756,28 @@ function HomePage() {
   };
 
   const handleSearch = () => {
-    // If we haven't loaded jobs yet, do it now
     if (jobs.length === 0) {
       fetchJobs();
     } else {
-      // If jobs are already loaded, just filter them
       if (filteredJobs.length > 0) {
         setSelectedJob(filteredJobs[0]);
       } else {
         setSelectedJob(null);
       }
     }
-    
     setHasSearched(true);
   };
-  const CategoryFilterIndicator = () => {
-    if (categoryFilter === 'all' || categoryFilter === 'All') {
-      return null;
-    }
-    
-    const categoryStyle = getCategoryColor(categoryFilter);
-    const categoryIcon = getCategoryIcon(categoryFilter);
-    
-    return (
-      <Box 
-        sx={{ 
-          display: 'flex', 
-          alignItems: 'center',
-          mt: 1,
-          ml: 2
-        }}
-      >
-        <Typography variant="body2" color="text.secondary" mr={1}>
-          Filtering by category:
-        </Typography>
-        <Chip
-          size="small"
-          icon={React.cloneElement(categoryIcon, { style: { fontSize: 16 } })}
-          label={categoryFilter}
-          onDelete={() => setCategoryFilter('all')}
-          sx={{
-            backgroundColor: categoryStyle.bg,
-            color: categoryStyle.color,
-            fontWeight: 'medium'
-          }}
-        />
-      </Box>
-    );
+
+  const handleCategoryClick = (category) => {
+    setCategoryFilter(category);
+    handleSearch();
   };
 
-  // Handle "Enter" key in search fields
   const handleKeyPress = (e) => {
     if (e.key === 'Enter') {
       handleSearch();
     }
   };
-
-  const SearchTips = () => {
-    const [open, setOpen] = useState(false);
-    
-    return (
-      <Box sx={{ position: 'relative', display: 'inline-block', ml: 1 }}>
-        <Tooltip title="Show search tips">
-          <IconButton
-            size="small"
-            onClick={() => setOpen(prev => !prev)}
-            sx={{ color: 'text.secondary' }}
-          >
-            <HelpOutline fontSize="small" />
-          </IconButton>
-        </Tooltip>
-        
-        <Popper
-          open={open}
-          anchorEl={document.getElementById('search-tips-button')}
-          placement="bottom-start"
-          transition
-          disablePortal
-          sx={{ zIndex: 10 }}
-        >
-          {({ TransitionProps }) => (
-            <Grow
-              {...TransitionProps}
-              style={{ transformOrigin: 'top left' }}
-            >
-              <Paper 
-                elevation={4}
-                sx={{ 
-                  mt: 1, 
-                  p: 2,
-                  maxWidth: 400,
-                  borderRadius: 2
-                }}
-              >
-                <ClickAwayListener onClickAway={() => setOpen(false)}>
-                  <Box>
-                    <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
-                      Search Tips
-                    </Typography>
-                    <Typography variant="body2" sx={{ mb: 1 }}>
-                      You can search by job title, company, or include category keywords:
-                    </Typography>
-                    <Grid container spacing={1}>
-                      <Grid item xs={6}>
-                        <Typography variant="body2" fontWeight="medium" color="primary">Category Examples:</Typography>
-                        <Typography variant="caption" component="div">
-                          • "developer" → Technology<br />
-                          • "nurse" → Healthcare<br />
-                          • "accounting" → Finance<br />
-                          • "civil engineer" → Engineering
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={6}>
-                        <Typography variant="body2" fontWeight="medium" color="primary">More Examples:</Typography>
-                        <Typography variant="caption" component="div">
-                          • "remote developer"<br />
-                          • "part-time teacher"<br />
-                          • "finance manager"<br />
-                          • "Google software"
-                        </Typography>
-                      </Grid>
-                    </Grid>
-                    <Box sx={{ mt: 1, textAlign: 'right' }}>
-                      <Button 
-                        size="small" 
-                        color="primary" 
-                        onClick={() => setOpen(false)}
-                        sx={{ textTransform: 'none' }}
-                      >
-                        Got it
-                      </Button>
-                    </Box>
-                  </Box>
-                </ClickAwayListener>
-              </Paper>
-            </Grow>
-          )}
-        </Popper>
-      </Box>
-    );
-  };
-
-  const userAvatar = user.profileImage || 'http://localhost:8080/uploads/default-profile.jpg';
 
   const handleLogout = () => {
     localStorage.removeItem("user");
@@ -852,368 +785,526 @@ function HomePage() {
     navigate('/login');
   };
 
+  // Load jobs on component mount
+  useEffect(() => {
+    fetchJobs();
+    setTimeout(() => setStatsAnimated(true), 1000);
+  }, []);
+
   return (
-    <div className="homepage">
-      <HomeNavbar handleLogout={handleLogout} userAvatar={userAvatar} user={user} />
-      <main className="content">
-        <div className="info-display-container">
-          <div className="greeting" style={{ fontSize: '24px', fontWeight: 'bold', color: 'white' }}>
-            Welcome, 
-            <span
-              style={{
-                background: 'linear-gradient(90deg, #e0f7e9, #a0f1c3)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                marginLeft: '5px',
-              }}
-            >
-              {user.name || "User"}!
-            </span>
-          </div>
-          <div className="center-content">
-            <p className="welcome-message">
-              {hasSearched && filteredJobs.length > 0
-                ? `Found ${filteredJobs.length} open jobs${categoryFilter !== 'all' && categoryFilter !== 'All' ? ` in ${categoryFilter}` : ''} matching your search.`
-                : hasSearched && filteredJobs.length === 0
-                ? "No open jobs found matching your criteria. Try a different search."
-                : "Find your dream job. Start by searching below."}
-            </p>
-          </div>
-        </div>
-        
-        {/* Search Panel */}
-<Container maxWidth="md" sx={{ mb: 2 }}>
-  <Paper
-    elevation={3}
-    sx={{
-      display: "flex",
-      flexDirection: { xs: "column", md: "row" },
-      alignItems: "center",
-      justifyContent: "space-between",
-      borderRadius: "8px",
-      position: "relative",
-      overflow: "hidden",
-      p: 0.5,
-    }}
-  >
     <Box sx={{ 
-  display: "flex", 
-  alignItems: "center", 
-  flex: 1, 
-  borderRight: { xs: "none", md: "1px solid #e0e0e0" }, 
-  borderBottom: { xs: "1px solid #e0e0e0", md: "none" }, 
-  p: 1 
-}}>
-  <StyledTextField
-    fullWidth
-    placeholder="Job Title, keywords, company"
-    name="title"
-    value={filters.title}
-    onChange={handleFilterChange}
-    onKeyPress={handleKeyPress}
-    InputProps={{
-      startAdornment: (
-        <InputAdornment position="start">
-          <Search sx={{ color: "text.secondary" }} />
-        </InputAdornment>
-      ),
-      endAdornment: (
-        <InputAdornment position="end">
-          <Box id="search-tips-button">
-            <SearchTips />
-          </Box>
-        </InputAdornment>
-      )
-    }}
-  />
-</Box>
-
-    <Box sx={{ display: "flex", alignItems: "center", flex: 1, p: 1 }}>
-      <StyledTextField
-        fullWidth
-        placeholder='City, state, zip code, or "remote"'
-        name="location"
-        value={filters.location}
-        onChange={handleFilterChange}
-        onKeyPress={handleKeyPress}
-        InputProps={{
-          startAdornment: (
-            <InputAdornment position="start">
-              <LocationOn sx={{ color: "text.secondary" }} />
-            </InputAdornment>
-          ),
-        }}
-      />
-    </Box>
-
-    <SearchButton
-      variant="contained"
-      onClick={handleSearch}
-      sx={{
-        position: { xs: "relative", md: "absolute" },
-        right: 8,
-        top: { md: "50%" },
-        transform: { md: "translateY(-50%)" },
-        width: { xs: "100%", md: "auto" },
-      }}
-    >
-      Search
-    </SearchButton>
-  </Paper>
-  
-  {/* Category Filter Indicator */}
-  <CategoryFilterIndicator />
-</Container>
-        
-        
-        {/* Category Tabs 
-        <Container maxWidth="md">
-          <Box sx={{ 
-            width: '100%', 
-            bgcolor: 'background.paper',
-            mb: 3,
-            borderRadius: 2,
-            boxShadow: 1
-          }}>
-            <Tabs
-              value={categoryFilter}
-              onChange={handleCategoryChange}
-              variant="scrollable"
-              scrollButtons="auto"
-              allowScrollButtonsMobile
-              textColor="primary"
-              indicatorColor="primary"
-              aria-label="job categories"
-              sx={{ 
-                '& .MuiTab-root': { 
-                  textTransform: 'none',
-                  fontWeight: 500,
-                  fontSize: '0.95rem'
-                }
-              }}
-            >
-              <Tab value="all" label="All Jobs" />
-              <Tab value="Technology" label="Technology" icon={<TechnologyIcon />} iconPosition="start" />
-              <Tab value="Healthcare" label="Healthcare" icon={<HealthcareIcon />} iconPosition="start" />
-              <Tab value="Finance" label="Finance" icon={<FinanceIcon />} iconPosition="start" />
-              <Tab value="Engineering" label="Engineering" icon={<EngineeringIcon />} iconPosition="start" />
-              <Tab value="Remote" label="Remote" icon={<LocationOn />} iconPosition="start" />
-              <Tab value="Education" label="Education" icon={<EducationIcon />} iconPosition="start" />
-            </Tabs>
-          </Box>
-        </Container>*/}
-
-        {/* Updated Results Section with fixed layout */}
-<Container maxWidth="xl" sx={{ pb: 4, px: { xs: 2, md: 4 } }}>
-  {loading ? (
-    <Grid container spacing={3} sx={{ height: { md: 'calc(100vh - 300px)' } }}>
-      <Grid item xs={12} md={4}>
-        {[1, 2, 3].map((i) => (
-          <Card key={i} sx={{ mb: 2, p: 2, borderRadius: 2 }}>
-            <Skeleton variant="text" width="70%" height={32} />
-            <Skeleton variant="text" width="50%" height={24} />
-            <Skeleton variant="text" width="40%" height={24} />
-          </Card>
-        ))}
-      </Grid>
-      <Grid item xs={12} md={8} sx={{ height: { md: '100%' } }}>
-        <Card sx={{ p: 3, borderRadius: 3, height: '100%' }}>
-          <Skeleton variant="text" width="60%" height={40} />
-          <Skeleton variant="text" width="40%" height={32} />
-          <Skeleton variant="rectangular" height={60} sx={{ my: 2 }} />
-          <Skeleton variant="rectangular" height={200} />
-        </Card>
-      </Grid>
-    </Grid>
-  ) : hasSearched ? (
-    filteredJobs.length > 0 ? (
-      <Grid container spacing={3}>
-        {/* Left Column: Job List */}
-        <Grid item xs={12} md={4}>
-          <Box sx={{ 
-            mb: 2, 
-            display: 'flex', 
-            justifyContent: 'space-between', 
-            alignItems: 'center' 
-          }}>
-            <Typography variant="h6">
-              {filteredJobs.length} Open {filteredJobs.length === 1 ? 'Job' : 'Jobs'} Found
-              {categoryFilter !== 'all' && categoryFilter !== 'All' ? ` in ${categoryFilter}` : ''}
-            </Typography>
-            
-            <Button 
-              variant="outlined" 
-              size="small"
-              onClick={() => {
-                setFilters({ title: '', location: '' });
-                setCategoryFilter('all');
-                setHasSearched(false);
-              }}
-              sx={{ 
-                textTransform: 'none',
-                borderRadius: 2,
-                fontSize: '0.75rem',
-                p: '4px 8px'
-              }}
-            >
-              Clear
-            </Button>
-          </Box>
-          
-          <Box sx={{ 
-            maxHeight: { md: 'calc(100vh - 300px)' }, 
-            overflowY: 'auto',
-            pr: { md: 2 }
-          }}>
-            {filteredJobs.map((job) => (
-              <JobCard 
-                key={job.id} 
-                job={job} 
-                selected={selectedJob && selectedJob.id === job.id}
-                onClick={() => setSelectedJob(job)} 
-              />
-            ))}
-          </Box>
-        </Grid>
-
-        {/* Right Column: Job Details - Fixed layout */}
-        <Grid item xs={12} md={8} id="job-details-section">
-          {selectedJob ? (
-            <JobDetailCard 
-              job={selectedJob} 
-              onApply={handleApply} 
-              onSave={handleSave} 
-            />
-          ) : (
-            <Card sx={{ 
-              p: 4, 
-              borderRadius: 3, 
-              textAlign: 'center', 
-              width: '100%',
-              height: '100%',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center',
-              minHeight: { md: 'calc(100vh - 400px)' }
-            }}>
-              <Typography variant="h5" gutterBottom>Select a job to view details</Typography>
-              <Typography variant="body1" color="text.secondary">
-                Browse the job listings on the left to see detailed information.
-              </Typography>
-            </Card>
-          )}
-        </Grid>
-      </Grid>
-    ) : (
-      // No results found
-      <Box sx={{ 
-        display: 'flex', 
-        flexDirection: 'column', 
-        alignItems: 'center', 
-        justifyContent: 'center', 
-        textAlign: 'center',
-        py: 6
-      }}>
-        <Work sx={{ fontSize: 60, color: 'text.secondary', mb: 2 }} />
-        <Typography variant="h5" gutterBottom>No open jobs match your search</Typography>
-        <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 500, mb: 3 }}>
-          {categoryFilter !== 'all' && categoryFilter !== 'All' 
-            ? `No jobs found in the ${categoryFilter} category matching your criteria.` 
-            : "Try adjusting your search criteria or using more general keywords to find more opportunities."}
-        </Typography>
-        <Button 
-          variant="contained" 
-          onClick={() => {
-            setFilters({ title: '', location: '' });
-            setCategoryFilter('all');
-            setHasSearched(false);
-          }}
-          sx={{ 
-            backgroundColor: "black", 
-            color: "white",
-            '&:hover': {
-              backgroundColor: "#333",
-            }
-          }}
-        >
-          Reset Search
-        </Button>
-      </Box>
-    )
-  ) : (
-    // Initial state - welcome message with illustration
-    <Box sx={{ 
-      display: 'flex', 
-      flexDirection: 'column', 
-      alignItems: 'center', 
-      justifyContent: 'center', 
-      textAlign: 'center',
-      py: 8
+      background: 'linear-gradient(135deg, #f7f9f7 0%, #e8f5e9 100%)',
+      minHeight: '100vh',
+      position: 'relative'
     }}>
-      <Box 
-        component="img" 
-        src="/job-search-illustration.svg" 
-        alt="Job Search" 
-        sx={{ 
-          width: { xs: '80%', sm: 300 }, 
-          height: 'auto', 
-          mb: 4,
-          display: 'none' // Hide if no image available
-        }} 
-      />
-      <Typography variant="h4" gutterBottom>Find Your Perfect Job</Typography>
-      <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 600, mb: 4 }}>
-        Enter job titles, keywords, or locations in the search bar above to discover opportunities that match your skills and preferences.
-      </Typography>
-      <Grid container spacing={2} sx={{ maxWidth: '800px', mx: 'auto' }}>
-        {/* All Jobs Button */}
-        <Grid item xs={12} sm={3}>
-          <Button 
-            variant="contained" 
-            onClick={handleSearch}
-            fullWidth
+      {/* Floating Background Shapes */}
+      <FloatingShape sx={{ width: 80, height: 80, top: '10%', left: '10%', animationDelay: '0s' }} />
+      <FloatingShape sx={{ width: 120, height: 120, top: '70%', right: '10%', animationDelay: '3s' }} />
+      <FloatingShape sx={{ width: 60, height: 60, top: '40%', left: '80%', animationDelay: '6s' }} />
+
+      <HomeNavbar handleLogout={handleLogout} user={user} />
+      
+      <Container maxWidth="lg" sx={{ pt: 4, pb: 8, position: 'relative', zIndex: 1 }}>
+        {/* Welcome Section */}
+        <WelcomeSection>
+          <WelcomeTitle variant="h1">
+            Find Your Perfect Job
+          </WelcomeTitle>
+          <Typography 
+            variant="h6" 
             sx={{ 
-              backgroundColor: "black", 
-              color: "white",
-              '&:hover': {
-                backgroundColor: "#333",
-              }
+              opacity: 0.9, 
+              mb: 2, 
+              maxWidth: 600, 
+              mx: 'auto',
+              position: 'relative',
+              zIndex: 2
             }}
           >
-            Browse All Jobs
-          </Button>
-        </Grid>
-        
-        {/* Category Buttons */}
-        {categories.slice(1).map((category) => (
-          <Grid item xs={12} sm={3} key={category}>
-            <Button
+            Discover thousands of opportunities that match your skills and career goals. 
+            Your dream job is just a search away.
+          </Typography>
+        </WelcomeSection>
+
+        {/* Search Container */}
+        <SearchContainer elevation={3}>
+          <Box sx={{ 
+            display: 'flex', 
+            gap: 2, 
+            alignItems: 'center', 
+            flexWrap: { xs: 'wrap', md: 'nowrap' } 
+          }}>
+            <TextField
               fullWidth
+              placeholder="Job Title, keywords, company"
+              name="title"
+              value={filters.title}
+              onChange={handleFilterChange}
+              onKeyPress={handleKeyPress}
               variant="outlined"
-              startIcon={getCategoryIcon(category)}
-              onClick={() => {
-                setCategoryFilter(category);
-                handleSearch();
+              size="small"
+              sx={{ 
+                minWidth: { xs: '100%', md: 250 },
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: 3,
+                  border: '2px solid rgba(45, 190, 95, 0.1)',
+                  background: 'white',
+                  fontSize: '0.75rem !important',
+                  '&:hover': {
+                    borderColor: 'rgba(45, 190, 95, 0.3)',
+                  },
+                  '&.Mui-focused': {
+                    borderColor: '#2DBE5F',
+                    boxShadow: '0 8px 25px rgba(45, 190, 95, 0.15)',
+                  }
+                },
+                '& .MuiInputBase-input': {
+                  fontSize: '0.75rem !important',
+                  padding: '8px 12px !important',
+                },
+                '& input::placeholder': {
+                  fontSize: '0.75rem !important',
+                  opacity: 0.6,
+                }
               }}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Search sx={{ color: '#2DBE5F', fontSize: '0.875rem' }} />
+                  </InputAdornment>
+                ),
+                style: { fontSize: '0.75rem' }
+              }}
+            />
+            
+            <TextField
+              fullWidth
+              placeholder='City, state, zip code, or "remote"'
+              name="location"
+              value={filters.location}
+              onChange={handleFilterChange}
+              onKeyPress={handleKeyPress}
+              variant="outlined"
+              size="small"
+              sx={{ 
+                minWidth: { xs: '100%', md: 250 },
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: 3,
+                  border: '2px solid rgba(45, 190, 95, 0.1)',
+                  background: 'white',
+                  fontSize: '0.75rem !important',
+                  '&:hover': {
+                    borderColor: 'rgba(45, 190, 95, 0.3)',
+                  },
+                  '&.Mui-focused': {
+                    borderColor: '#2DBE5F',
+                    boxShadow: '0 8px 25px rgba(45, 190, 95, 0.15)',
+                  }
+                },
+                '& .MuiInputBase-input': {
+                  fontSize: '0.75rem !important',
+                  padding: '8px 12px !important',
+                },
+                '& input::placeholder': {
+                  fontSize: '0.75rem !important',
+                  opacity: 0.6,
+                }
+              }}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <LocationOn sx={{ color: '#2DBE5F', fontSize: '0.875rem' }} />
+                  </InputAdornment>
+                ),
+                style: { fontSize: '0.75rem' }
+              }}
+            />
+            
+            <Button
+              variant="contained"
+              onClick={handleSearch}
               sx={{
-                borderColor: getCategoryColor(category).color,
-                color: getCategoryColor(category).color,
+                background: 'linear-gradient(135deg, #2DBE5F, #28ab56)',
+                color: 'white',
+                borderRadius: 3,
+                px: 3,
+                py: 1.5,
+                fontSize: '0.75rem',
+                fontWeight: 600,
+                textTransform: 'none',
+                boxShadow: '0 8px 25px rgba(45, 190, 95, 0.3)',
+                whiteSpace: 'nowrap',
                 '&:hover': {
-                  backgroundColor: getCategoryColor(category).bg,
-                  borderColor: getCategoryColor(category).color,
+                  background: 'linear-gradient(135deg, #28ab56, #259a4d)',
+                  transform: 'translateY(-2px)',
+                  boxShadow: '0 12px 35px rgba(45, 190, 95, 0.4)',
                 }
               }}
             >
-              {category} Jobs
+              <Search sx={{ mr: 0.5, fontSize: '0.875rem' }} />
+              Search Jobs
             </Button>
-          </Grid>
-        ))}
-      </Grid>
-    </Box>
-  )}
-</Container>
-      </main>
+          </Box>
+        </SearchContainer>
 
+        {/* Categories Section */}
+        {!hasSearched && (
+          <Fade in={true} timeout={1000}>
+            <Box sx={{ mb: 4 }}>
+              <Typography 
+                variant="h4" 
+                sx={{ 
+                  textAlign: 'center', 
+                  fontWeight: 700, 
+                  color: '#333', 
+                  mb: 1 
+                }}
+              >
+                Browse Jobs by Category
+              </Typography>
+              <Typography 
+                variant="body1" 
+                sx={{ 
+                  textAlign: 'center', 
+                  color: '#666', 
+                  mb: 4,
+                  fontSize: '1.1rem'
+                }}
+              >
+                Find opportunities in your field of expertise
+              </Typography>
+              
+              <Grid container spacing={3}>
+                {/* Browse All Card */}
+                <Grid item xs={12} sm={6} md={4} lg={3}>
+                  <BrowseAllCard onClick={() => handleCategoryClick('all')}>
+                    <Box sx={{ fontSize: '3rem', mb: 1 }}>🔍</Box>
+                    <Typography variant="h6" sx={{ fontWeight: 700, mb: 0.5, color: 'white' }}>
+                      Browse All Jobs
+                    </Typography>
+                    <Typography variant="body2" sx={{ mb: 2, color: 'rgba(255,255,255,0.9)' }}>
+                      Explore every opportunity
+                    </Typography>
+                    <CategoryButton className="category-button">
+                      View All
+                    </CategoryButton>
+                  </BrowseAllCard>
+                </Grid>
+
+                {/* Category Cards */}
+                {categories.slice(1).map((category) => (
+                  <Grid item xs={12} sm={6} md={4} lg={3} key={category.name}>
+                    <CategoryCard onClick={() => handleCategoryClick(category.name)}>
+                      {getCategoryIcon(category.name.toLowerCase())}
+                      <Typography variant="h6" sx={{ fontWeight: 700, color: '#333', mb: 0.5 }}>
+                        {category.name}
+                      </Typography>
+                      <Typography variant="body2" sx={{ color: '#666', mb: 2 }}>
+                        {category.name === 'Technology' && 'Software, AI, Data & More'}
+                        {category.name === 'Healthcare' && 'Medical & Wellness Careers'}
+                        {category.name === 'Finance' && 'Banking, Investment & Analysis'}
+                        {category.name === 'Engineering' && 'Build the Future'}
+                        {category.name === 'Remote' && 'Work From Anywhere'}
+                        {category.name === 'Education' && 'Teaching & Learning'}
+                        {category.name === 'Other' && 'Explore More Categories'}
+                      </Typography>
+                      <CategoryButton className="category-button">
+                        Explore {category.name}
+                      </CategoryButton>
+                    </CategoryCard>
+                  </Grid>
+                ))}
+              </Grid>
+            </Box>
+          </Fade>
+        )}
+
+        {/* Stats Bar */}
+        {!hasSearched && (
+          <Fade in={statsAnimated} timeout={1000}>
+            <StatsBar>
+              <Box sx={{ textAlign: 'center' }}>
+                <Typography 
+                  variant="h3" 
+                  sx={{ 
+                    fontWeight: 800, 
+                    color: '#2DBE5F', 
+                    mb: 0.5 
+                  }}
+                >
+                  50K+
+                </Typography>
+                <Typography variant="body1" sx={{ color: '#666', fontWeight: 500 }}>
+                  Active Jobs
+                </Typography>
+              </Box>
+              <Box sx={{ textAlign: 'center' }}>
+                <Typography 
+                  variant="h3" 
+                  sx={{ 
+                    fontWeight: 800, 
+                    color: '#2DBE5F', 
+                    mb: 0.5 
+                  }}
+                >
+                  15K+
+                </Typography>
+                <Typography variant="body1" sx={{ color: '#666', fontWeight: 500 }}>
+                  Companies
+                </Typography>
+              </Box>
+              <Box sx={{ textAlign: 'center' }}>
+                <Typography 
+                  variant="h3" 
+                  sx={{ 
+                    fontWeight: 800, 
+                    color: '#2DBE5F', 
+                    mb: 0.5 
+                  }}
+                >
+                  100K+
+                </Typography>
+                <Typography variant="body1" sx={{ color: '#666', fontWeight: 500 }}>
+                  Success Stories
+                </Typography>
+              </Box>
+              <Box sx={{ textAlign: 'center' }}>
+                <Typography 
+                  variant="h3" 
+                  sx={{ 
+                    fontWeight: 800, 
+                    color: '#2DBE5F', 
+                    mb: 0.5 
+                  }}
+                >
+                  5K+
+                </Typography>
+                <Typography variant="body1" sx={{ color: '#666', fontWeight: 500 }}>
+                  New Jobs Weekly
+                </Typography>
+              </Box>
+            </StatsBar>
+          </Fade>
+        )}
+
+        {/* Search Results Section */}
+        {hasSearched && (
+          <Container maxWidth="xl" sx={{ pb: 4 }}>
+            {loading ? (
+              <Grid container spacing={3}>
+                <Grid item xs={12} md={4}>
+                  {[1, 2, 3].map((i) => (
+                    <Card key={i} sx={{ mb: 2, p: 2, borderRadius: 3 }}>
+                      <Skeleton variant="text" width="70%" height={32} />
+                      <Skeleton variant="text" width="50%" height={24} />
+                      <Skeleton variant="text" width="40%" height={24} />
+                    </Card>
+                  ))}
+                </Grid>
+                <Grid item xs={12} md={8}>
+                  <Card sx={{ p: 3, borderRadius: 3, height: '100%' }}>
+                    <Skeleton variant="text" width="60%" height={40} />
+                    <Skeleton variant="text" width="40%" height={32} />
+                    <Skeleton variant="rectangular" height={60} sx={{ my: 2 }} />
+                    <Skeleton variant="rectangular" height={200} />
+                  </Card>
+                </Grid>
+              </Grid>
+            ) : filteredJobs.length > 0 ? (
+              <Grid container spacing={3}>
+                {/* Left Column: Job List */}
+                <Grid item xs={12} md={4}>
+                  <Box sx={{ 
+                    mb: 2, 
+                    display: 'flex', 
+                    justifyContent: 'space-between', 
+                    alignItems: 'center' 
+                  }}>
+                    <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                      {filteredJobs.length} Open {filteredJobs.length === 1 ? 'Job' : 'Jobs'} Found
+                      {categoryFilter !== 'all' && categoryFilter !== 'All' ? ` in ${categoryFilter}` : ''}
+                    </Typography>
+                    
+                    <Button 
+                      variant="outlined" 
+                      size="small"
+                      onClick={() => {
+                        setFilters({ title: '', location: '' });
+                        setCategoryFilter('all');
+                        setHasSearched(false);
+                      }}
+                      sx={{ 
+                        textTransform: 'none',
+                        borderRadius: 2,
+                        borderColor: '#2DBE5F',
+                        color: '#2DBE5F',
+                        fontSize: '0.75rem',
+                        p: '4px 8px',
+                        '&:hover': {
+                          borderColor: '#28ab56',
+                          backgroundColor: 'rgba(45, 190, 95, 0.04)'
+                        }
+                      }}
+                    >
+                      Clear
+                    </Button>
+                  </Box>
+                  
+                  <Box sx={{ 
+                    maxHeight: { md: 'calc(100vh - 300px)' }, 
+                    overflowY: 'auto',
+                    pr: { md: 2 }
+                  }}>
+                    {filteredJobs.map((job) => (
+                      <JobCard 
+                        key={job.id} 
+                        job={job} 
+                        selected={selectedJob && selectedJob.id === job.id}
+                        onClick={() => setSelectedJob(job)} 
+                      />
+                    ))}
+                  </Box>
+                </Grid>
+
+                {/* Right Column: Job Details */}
+                <Grid item xs={12} md={8}>
+                  {selectedJob ? (
+                    <JobDetailCard 
+                      job={selectedJob} 
+                      onApply={handleApply} 
+                      onSave={handleSave} 
+                    />
+                  ) : (
+                    <Card sx={{ 
+                      p: 4, 
+                      borderRadius: 3, 
+                      textAlign: 'center', 
+                      width: '100%',
+                      height: '100%',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'center',
+                      minHeight: { md: 'calc(100vh - 400px)' }
+                    }}>
+                      <Typography variant="h5" gutterBottom sx={{ fontWeight: 600 }}>
+                        Select a job to view details
+                      </Typography>
+                      <Typography variant="body1" color="text.secondary">
+                        Browse the job listings on the left to see detailed information.
+                      </Typography>
+                    </Card>
+                  )}
+                </Grid>
+              </Grid>
+            ) : (
+              // No results found
+              <Box sx={{ 
+                display: 'flex', 
+                flexDirection: 'column', 
+                alignItems: 'center', 
+                justifyContent: 'center', 
+                textAlign: 'center',
+                py: 8
+              }}>
+                <Work sx={{ fontSize: 80, color: 'text.secondary', mb: 2 }} />
+                <Typography variant="h4" gutterBottom sx={{ fontWeight: 600 }}>
+                  No open jobs match your search
+                </Typography>
+                <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 500, mb: 3 }}>
+                  {categoryFilter !== 'all' && categoryFilter !== 'All' 
+                    ? `No jobs found in the ${categoryFilter} category matching your criteria.` 
+                    : "Try adjusting your search criteria or using more general keywords to find more opportunities."}
+                </Typography>
+                <Button 
+                  variant="contained" 
+                  onClick={() => {
+                    setFilters({ title: '', location: '' });
+                    setCategoryFilter('all');
+                    setHasSearched(false);
+                  }}
+                  sx={{ 
+                    background: 'linear-gradient(135deg, #2DBE5F, #28ab56)',
+                    color: 'white',
+                    borderRadius: 2,
+                    px: 3,
+                    py: 1.5,
+                    '&:hover': {
+                      background: 'linear-gradient(135deg, #28ab56, #259a4d)',
+                    }
+                  }}
+                >
+                  Reset Search
+                </Button>
+              </Box>
+            )}
+          </Container>
+        )}
+
+        {/* Job Search Tips Section */}
+        {!hasSearched && (
+          <Fade in={true} timeout={1500}>
+            <Paper 
+              elevation={2}
+              sx={{ 
+                background: 'linear-gradient(135deg, rgba(45,190,95,0.05), rgba(45,190,95,0.1))',
+                borderRadius: 4,
+                p: 4,
+                border: '1px solid rgba(45, 190, 95, 0.2)',
+                mt: 4
+              }}
+            >
+              <Typography 
+                variant="h5" 
+                sx={{ 
+                  fontWeight: 700, 
+                  color: '#333', 
+                  mb: 3,
+                  textAlign: 'center',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+              >
+                <Star sx={{ color: '#2DBE5F', mr: 1 }} />
+                Job Search Tips for Success
+              </Typography>
+              
+              <Grid container spacing={2}>
+                {[
+                  { icon: '📄', text: 'Keep your resume updated and tailored to each application' },
+                  { icon: '🤝', text: 'Network actively and maintain professional connections' },
+                  { icon: '🔍', text: 'Use specific keywords related to your desired position' },
+                  { icon: '⏰', text: 'Apply promptly to new job postings for better visibility' },
+                  { icon: '🏢', text: 'Research companies thoroughly before applying' },
+                  { icon: '✉️', text: 'Write personalized cover letters for each application' }
+                ].map((tip, index) => (
+                  <Grid item xs={12} md={6} key={index}>
+                    <Paper 
+                      elevation={1}
+                      sx={{ 
+                        p: 2, 
+                        borderRadius: 2,
+                        background: 'white',
+                        border: '1px solid rgba(45, 190, 95, 0.1)',
+                        height: '100%',
+                        display: 'flex',
+                        alignItems: 'center'
+                      }}
+                    >
+                      <Box sx={{ fontSize: '1.5rem', mr: 2 }}>{tip.icon}</Box>
+                      <Typography variant="body1" sx={{ color: '#666', lineHeight: 1.5 }}>
+                        {tip.text}
+                      </Typography>
+                    </Paper>
+                  </Grid>
+                ))}
+              </Grid>
+            </Paper>
+          </Fade>
+        )}
+      </Container>
+
+      {/* Snackbar */}
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={6000}
@@ -1223,12 +1314,15 @@ function HomePage() {
         <Alert 
           onClose={() => setSnackbarOpen(false)} 
           severity={snackbarSeverity} 
-          sx={{ width: '100%' }}
+          sx={{ 
+            width: '100%',
+            borderRadius: 2
+          }}
         >
           {snackbarMessage}
         </Alert>
       </Snackbar>
-    </div>
+    </Box>
   );
 }
 

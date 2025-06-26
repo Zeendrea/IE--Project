@@ -41,7 +41,6 @@ import {
   LocationOn as LocationIcon,
   Work as WorkIcon,
   Description as DescriptionIcon,
-  AttachMoney as MoneyIcon,
   Schedule as ScheduleIcon,
   Business as BusinessIcon,
   ArrowBack as ArrowBackIcon,
@@ -541,7 +540,7 @@ function ProviderHomePage() {
                     <Stack direction="row" spacing={1.5} sx={{ mb: 2, flexWrap: 'wrap', gap: 1 }}>
                         {job.pay && (
                             <Chip 
-                                icon={<MoneyIcon />} 
+                                icon={<Typography sx={{ fontSize: '0.875rem', fontWeight: 'bold' }}>₱</Typography>} 
                                 label={job.pay} 
                                 variant="outlined" 
                                 size="small" 
@@ -730,9 +729,15 @@ function ProviderHomePage() {
                                         required
                                         fullWidth
                                         variant="outlined"
-                                        placeholder="e.g. $15-20/hr or $60,000-75,000/year"
+                                        placeholder="e.g. ₱15,000-20,000/month or ₱300-500/day"
                                         InputProps={{
-                                            startAdornment: <MoneyIcon color="action" sx={{ mr: 1 }} />,
+                                            startAdornment: (
+                                                <InputAdornment position="start">
+                                                    <Typography sx={{ color: 'action.active', fontWeight: 'bold' }}>
+                                                        ₱
+                                                    </Typography>
+                                                </InputAdornment>
+                                            ),
                                             sx: { borderRadius: 4 }
                                         }}
                                     />
